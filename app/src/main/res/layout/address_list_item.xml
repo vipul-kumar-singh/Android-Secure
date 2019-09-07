@@ -17,35 +17,35 @@
             android:padding="8dp">
 
             <TextView
-                android:id="@+id/houseNumber"
+                android:id="@+id/houseNumberEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="House Number"
                 android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/area"
+                android:id="@+id/areaEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Area"
                 android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/state"
+                android:id="@+id/stateEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="State"
                 android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/city"
+                android:id="@+id/cityEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="City"
                 android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/pinCode"
+                android:id="@+id/pinCodeEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Pin Code"

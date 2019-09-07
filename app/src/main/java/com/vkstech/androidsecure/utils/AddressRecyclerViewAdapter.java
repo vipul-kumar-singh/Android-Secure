@@ -1,7 +1,6 @@
 package com.vkstech.androidsecure.utils;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,11 +79,11 @@ public class AddressRecyclerViewAdapter extends RecyclerView.Adapter<AddressRecy
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            houseNumber = itemView.findViewById(R.id.houseNumber);
-            area = itemView.findViewById(R.id.area);
-            city = itemView.findViewById(R.id.city);
-            state = itemView.findViewById(R.id.state);
-            pinCode = itemView.findViewById(R.id.pinCode);
+            houseNumber = itemView.findViewById(R.id.houseNumberEditText);
+            area = itemView.findViewById(R.id.areaEditText);
+            city = itemView.findViewById(R.id.cityEditText);
+            state = itemView.findViewById(R.id.stateEditText);
+            pinCode = itemView.findViewById(R.id.pinCodeEditText);
 
             linearLayout = itemView.findViewById(R.id.cardLinearLayout);
 

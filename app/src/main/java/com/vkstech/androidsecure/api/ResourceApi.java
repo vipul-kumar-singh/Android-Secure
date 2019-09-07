@@ -1,6 +1,7 @@
 package com.vkstech.androidsecure.api;
 
 import com.vkstech.androidsecure.constants.ApplicationConstants;
+import com.vkstech.androidsecure.dto.AddressDto;
 import com.vkstech.androidsecure.dto.ResponseObject;
 import com.vkstech.androidsecure.dto.SignUpForm;
 
@@ -16,6 +17,6 @@ public interface ResourceApi {
     Call<ResponseObject> getMyAddresses(@Header(ApplicationConstants.AUTHORIZATION_HEADER) String bearerToken);
 
     @POST("user/address")
-    Call<ResponseObject> addAddress(@Body SignUpForm signUpForm);
+    Call<ResponseObject> addAddress(@Header(ApplicationConstants.AUTHORIZATION_HEADER) String bearerToken, @Body AddressDto addressDto);
 
 }

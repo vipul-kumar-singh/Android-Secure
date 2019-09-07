@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -126,5 +127,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         loadData();
+    }
+
+    public void gotoNewAddressActivity(View view) {
+        Intent intent = new Intent(this,NewAddressActivity.class);
+        startActivity(intent);
     }
 }
