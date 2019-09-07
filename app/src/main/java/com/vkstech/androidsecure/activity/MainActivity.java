@@ -1,5 +1,6 @@
 package com.vkstech.androidsecure.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,6 +11,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -23,9 +27,11 @@ import com.vkstech.androidsecure.constants.SharedPreferencesKeys;
 import com.vkstech.androidsecure.dto.AccessTokenResponse;
 import com.vkstech.androidsecure.dto.Address;
 import com.vkstech.androidsecure.dto.ResponseObject;
+import com.vkstech.androidsecure.exceptionHandler.ErrorMessageHandler;
 import com.vkstech.androidsecure.utils.AddressRecyclerViewAdapter;
 import com.vkstech.androidsecure.utils.ApiUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences sharedPreferences;
 
@@ -43,8 +49,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private List<Address> addressList;
 
+    private ErrorMessageHandler errorHandler;
+
     private Gson gson;
-    private String accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         adapter = new AddressRecyclerViewAdapter(addressList, this);
 
         gson = new Gson();
+
+        errorHandler = new ErrorMessageHandler();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
@@ -89,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void loadData() {
-        accessToken = sharedPreferences.getString(SharedPreferencesKeys.ACCESS_TOKEN, null);
+        String accessToken = sharedPreferences.getString(SharedPreferencesKeys.ACCESS_TOKEN, null);
 
         if (accessToken == null)
             return;
@@ -104,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                 if (response.code() == 200 && response.body() != null) {
                     String jsonString = gson.toJson(response.body().getData());
-                    addressList = gson.fromJson(jsonString, new TypeToken<List<Address>>(){}.getType());
+                    addressList = gson.fromJson(jsonString, new TypeToken<List<Address>>() {
+                    }.getType());
 
                     Toast.makeText(MainActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
@@ -112,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     swipeRefreshLayout.setRefreshing(false);
 
                     recyclerView.scrollToPosition(addressList.size() - 1);
+                } else {
+                    errorHandler.handleRetrofitErrorMessage(response, MainActivity.this);
                 }
 
             }
@@ -119,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             @Override
             public void onFailure(Call<ResponseObject> call, Throwable t) {
                 Log.e("error", t.getMessage());
-                    swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -130,7 +142,63 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void gotoNewAddressActivity(View view) {
-        Intent intent = new Intent(this,NewAddressActivity.class);
+        Intent intent = new Intent(this, NewAddressActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+
+            case R.id.logout:
+                logout();
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void logout() {
+        swipeRefreshLayout.setRefreshing(true);
+
+        String accessToken = sharedPreferences.getString(SharedPreferencesKeys.ACCESS_TOKEN, null);
+
+        if (accessToken == null)
+            return;
+
+        String bearerToken = ApplicationConstants.BEARER_TOKEN_TITLE + accessToken;
+
+        ApiUtil.getAuthApiRequest().logout(bearerToken).enqueue(new Callback<ResponseObject>() {
+            @Override
+            public void onResponse(Call<ResponseObject> call, Response<ResponseObject> response) {
+            }
+
+            @Override
+            public void onFailure(Call<ResponseObject> call, Throwable t) {
+            }
+        });
+
+        sharedPreferences
+                .edit()
+                .remove(SharedPreferencesKeys.ACCESS_TOKEN)
+                .remove(SharedPreferencesKeys.REFRESH_TOKEN)
+                .commit();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+
     }
 }

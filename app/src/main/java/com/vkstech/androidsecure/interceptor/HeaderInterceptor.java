@@ -15,8 +15,14 @@ public class HeaderInterceptor implements Interceptor {
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
-        Request request = chain
-                .request()
+
+        Request request = chain.request();
+        if (request.url().encodedPath().equalsIgnoreCase("/common/logout")) {
+            return  chain.proceed(request);
+        }
+
+
+        request = request
                 .newBuilder()
                 .addHeader(ApplicationConstants.AUTHORIZATION_HEADER, ApplicationConstants.BASIC_TOKEN)
                 .build();
